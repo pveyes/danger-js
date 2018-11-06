@@ -24,9 +24,9 @@ export interface CheckImages {
 }
 
 export interface CheckAnnotation {
-  filename: string
+  path: string
   blob_href: string
-  warning_level: "notice" | "warning" | "failure"
+  annotation_level: "notice" | "warning" | "failure"
   message: string
   start_line: number
   end_line: number
@@ -129,9 +129,9 @@ const inlineResultsToAnnotations = async (
 
   for (const perFileResults of inlineResults) {
     const annotation: CheckAnnotation = {
-      filename: perFileResults.file,
+      path: perFileResults.file,
       blob_href: await getBlobUrlForPath(perFileResults.file),
-      warning_level: warningLevelForInlineResults(perFileResults),
+      annotation_level: annotationLevelForInlineResults(perFileResults),
       message: githubResultsInlineTemplate(
         options.dangerID,
         inlineResultsIntoResults(perFileResults),
@@ -148,7 +148,7 @@ const inlineResultsToAnnotations = async (
   return annotations
 }
 
-const warningLevelForInlineResults = (results: DangerInlineResults): "notice" | "warning" | "failure" => {
+const annotationLevelForInlineResults = (results: DangerInlineResults): "notice" | "warning" | "failure" => {
   const hasFails = results.fails.length > 0
   const hasWarnings = results.warnings.length > 0
   return hasFails ? "failure" : hasWarnings ? "warning" : "notice"
