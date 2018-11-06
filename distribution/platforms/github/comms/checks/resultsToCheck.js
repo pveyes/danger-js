@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -103,31 +114,49 @@ exports.resultsToCheck = function (results, options, pr, api, name) {
         });
     });
 };
-var inlineResultsToAnnotations = function (results, options, getBlobUrlForPath) { return __awaiter(_this, void 0, void 0, function () {
-    var inlineResults, annotations, _i, inlineResults_1, perFileResults, annotation, _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+var inlineResultsToAnnotations = function (results, _options, getBlobUrlForPath) { return __awaiter(_this, void 0, void 0, function () {
+    var inlineResults, annotations, _loop_1, _i, inlineResults_1, perFileResults;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
                 inlineResults = DangerResults_1.resultsIntoInlineResults(results);
                 annotations = [];
+                _loop_1 = function (perFileResults) {
+                    var fileAnnotation, _a;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
+                            case 0:
+                                _a = {
+                                    path: perFileResults.file
+                                };
+                                return [4 /*yield*/, getBlobUrlForPath(perFileResults.file)];
+                            case 1:
+                                fileAnnotation = (_a.blob_href = _b.sent(),
+                                    _a.start_line = perFileResults.line || 0,
+                                    _a.end_line = perFileResults.line || 0,
+                                    _a);
+                                perFileResults.fails.forEach(function (message) {
+                                    annotations.push(__assign({}, fileAnnotation, { annotation_level: "failure", message: message }));
+                                });
+                                perFileResults.warnings.forEach(function (message) {
+                                    annotations.push(__assign({}, fileAnnotation, { annotation_level: "warning", message: message }));
+                                });
+                                perFileResults.messages.forEach(function (message) {
+                                    annotations.push(__assign({}, fileAnnotation, { annotation_level: "notice", message: message }));
+                                });
+                                return [2 /*return*/];
+                        }
+                    });
+                };
                 _i = 0, inlineResults_1 = inlineResults;
-                _b.label = 1;
+                _a.label = 1;
             case 1:
                 if (!(_i < inlineResults_1.length)) return [3 /*break*/, 4];
                 perFileResults = inlineResults_1[_i];
-                _a = {
-                    path: perFileResults.file
-                };
-                return [4 /*yield*/, getBlobUrlForPath(perFileResults.file)];
+                return [5 /*yield**/, _loop_1(perFileResults)];
             case 2:
-                annotation = (_a.blob_href = _b.sent(),
-                    _a.annotation_level = annotationLevelForInlineResults(perFileResults),
-                    _a.message = githubIssueTemplate_1.inlineTemplate(options.dangerID, DangerResults_1.inlineResultsIntoResults(perFileResults), perFileResults.file, perFileResults.line),
-                    _a.start_line = perFileResults.line || 0,
-                    _a.end_line = perFileResults.line || 0,
-                    _a);
-                annotations.push(annotation);
-                _b.label = 3;
+                _a.sent();
+                _a.label = 3;
             case 3:
                 _i++;
                 return [3 /*break*/, 1];
@@ -135,9 +164,4 @@ var inlineResultsToAnnotations = function (results, options, getBlobUrlForPath) 
         }
     });
 }); };
-var annotationLevelForInlineResults = function (results) {
-    var hasFails = results.fails.length > 0;
-    var hasWarnings = results.warnings.length > 0;
-    return hasFails ? "failure" : hasWarnings ? "warning" : "notice";
-};
 //# sourceMappingURL=resultsToCheck.js.map
